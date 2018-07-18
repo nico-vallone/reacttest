@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+//the 1D array of squares means this is the most 
+//efficient way of checking if the game is over
 function calculateWinner(squares){
 	const winningLines = [
 		[0,1,2],//horizontal wins
@@ -10,7 +12,7 @@ function calculateWinner(squares){
 		[0,3,6],//vertical wins
 		[1,4,7],
 		[2,5,8],
-		[0,4,7],//diagonal wins
+		[0,4,8],//diagonal wins
 		[6,4,2],
 	];
 	for (let i=0; i < winningLines.length; i++){
@@ -45,8 +47,12 @@ class Board extends React.Component {
 	//creates a copy of the current squares
 	//(see immutability), changes the copy, and assigns
 	//the current state to the new squares
+	//also does nothing if square already clicked or game over
   handleClick(i) {
-    const squares = this.state.squares.slice();
+		const squares = this.state.squares.slice();
+		if(calculateWinner(squares) || squares[i]) {
+			return;
+		}
     squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({
       squares: squares,
