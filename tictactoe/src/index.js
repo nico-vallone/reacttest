@@ -2,6 +2,29 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+function calculateWinner(squares){
+	const winningLines = [
+		[0,1,2],//horizontal wins
+		[3,4,5],
+		[6,7,8],
+		[0,3,6],//vertical wins
+		[1,4,7],
+		[2,5,8],
+		[0,4,7],//diagonal wins
+		[6,4,2],
+	];
+	for (let i=0; i < winningLines.length; i++){
+		const [a,b,c] = winningLines[i];
+		if(squares[a] && 
+			squares[a] === squares[b] &&
+			squares[a] === squares[c])
+			return squares[a];
+	}
+	return null;
+}
+
+//functional component renders thei nformation passed to
+//it from the board component props
 function Square(props){
   return(
   <button className="square" onClick={props.onClick}>
@@ -14,11 +37,14 @@ class Board extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      squares: Array(9).fill(null),
+      squares: Array(9).fill(null), //having this be 1D breaks my heart
       xIsNext: true,
     };
   }
-  
+	
+	//creates a copy of the current squares
+	//(see immutability), changes the copy, and assigns
+	//the current state to the new squares
   handleClick(i) {
     const squares = this.state.squares.slice();
     squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -37,7 +63,13 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+		const winner = calculateWinner(this.state.squares);
+		let status;
+		if (winner){
+			status = 'Winner ' + winner;
+		} else {
+			status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+		} 
 
     return (
       <div>
