@@ -76,6 +76,7 @@ class Game extends React.Component {
 				squares: Array(9).fill(null),
 			}],
 			xIsNext: true,
+			stepNumber = 0,
 		};
 	}
 
@@ -84,8 +85,8 @@ class Game extends React.Component {
 	//the current state to the new squares
 	//also does nothing if square already clicked or game over
   handleClick(i) {
-		const history = this.state.history;
-		const current = history[history.length - 1];
+		const history = this.state.history.slice(0, this.state.stepNumber + 1);
+		const current = history[history.length-1];
 		const squares = current.squares.slice();
 
 		if(calculateWinner(squares) || squares[i]) {
@@ -98,21 +99,30 @@ class Game extends React.Component {
       history: history.concat([{
 				squares: squares,
 			}]),
+			stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
     });
-  }
+	}
+	
+	jumpTo(step){
+		this.setState({
+			stepNumber: step,
+			xIsNext: stepNumber % 2 === 0,
+		});
+	}
 
   render() {
 		const history = this.state.history;
-		const current = history[history.length - 1];
+		const current = history[this.state.stepNumber];
 		const winner = calculateWinner(current.squares);
 
+		//maps history of moves to a list of jump buttons on screen
 		const moves = history.map((step, move) => {
 			const desc = move ? 
 				'Go to move #' + move :
 				'Go to game start';
 			return (
-				<li>
+				<li key={move}>
 					<button onClick={() => this.jumpTo(move)}>
 						{desc}
 					</button>
